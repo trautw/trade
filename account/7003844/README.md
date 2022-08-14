@@ -1,0 +1,9 @@
+Host ICM ForexVPS
+
+EURUSD,M5
+
+VPR M5
+RSI M5
+CCI M5
+ATR M5
+
