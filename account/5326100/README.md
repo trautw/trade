@@ -1,0 +1,13 @@
+Host SKW24
+
+EURUSD,M5
+
+Mom H1
+Stoch H1
+Identify H12
+MACD H4
+MACD H1
+> MA(12) H1
+> MA(144) H1
+> MA(169) H1
+
