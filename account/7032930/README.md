@@ -1,5 +1,5 @@
 7032930
 ICMarketsSC-MT5-2
 
-Host: aktuell T420s, soon ForexVPS
+Host: Win10 SKWeg24
 GBPUSD,M5
