@@ -1,14 +1,17 @@
+# Standard library imports
 from datetime import datetime
+
+# Third party imports
 from flask import Flask
 from flask import request
+from logging.config import dictConfig
 import json
 import numpy as np
-from sklearn.linear_model import LinearRegression
 import pandas as pd
-import MetaTrader5 as mt5
-from handler import newBar
+from sklearn.linear_model import LinearRegression
 
-from logging.config import dictConfig
+# Local application imports
+from handler import newBar, init_for_mt
 
 dictConfig({
     'version': 1,
@@ -70,10 +73,6 @@ def indx():
             return '404'
 
 if __name__ == "__main__":
-    print("MetaTrader5 package author: ", mt5.__author__)
-    print("MetaTrader5 package version: ", mt5.__version__)
-
-    newBar()
-    newBar()
+    init_for_mt()
 
     app.run(host='localhost', port='43560')

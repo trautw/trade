@@ -2,6 +2,8 @@ from catboost import CatBoostClassifier
 import pandas as pd
 import MetaTrader5 as mt5
 
+from features import update_features
+
 MA_PERIODS = [i for i in range(15, 500, 15)]
 
 def update_rates(old_df, count = 10) -> pd.DataFrame:
@@ -30,18 +32,18 @@ def update_rates(old_df, count = 10) -> pd.DataFrame:
 def calc_features(ds) -> pd.Series:
     current_row = ds.iloc[-1]
     dsC = ds.copy()
-    f = pd.Series([current_row['close']],dtype = float)
+    X = pd.Series(dtype = float)
 
     count = 0
     for i in MA_PERIODS:
         # f[str(count)] = dsC - dsC.rolling(i).mean()
         m = dsC - dsC.rolling(i).mean()
         mean = m.iloc[-1]['close']
-        f = pd.concat([f,pd.Series([mean])], ignore_index=True)
+        X = pd.concat([X,pd.Series([mean])], ignore_index=True)
         count += 1
     print('features')
-    print(f)
-    return f
+    print(X)
+    return X
 
 def initDataset() -> pd.DataFrame:
     return pd.DataFrame()
@@ -51,13 +53,21 @@ def newBar():
     dataset = update_rates(dataset)
     print('Rates updated')
     print(dataset)
-    features = calc_features(dataset)
-    signal = model.predict(features)
-    meta_signal = meta_model.predict(features)
+    # X = calc_features(dataset)
+    X = update_features(dataset)
+    signal = model.predict(X.iloc[-1])
+    meta_signal = meta_model.predict(X.iloc[-1])
     return signal, meta_signal
 
+def init_for_mt():
+    global model
+    global meta_model
+    global dataset
 
-model = CatBoostClassifier(iterations=1000,
+    print("MetaTrader5 package author: ", mt5.__author__)
+    print("MetaTrader5 package version: ", mt5.__version__)
+
+    model = CatBoostClassifier(iterations=1000,
                                depth=6,
                                learning_rate=0.1,
                                custom_loss=['Accuracy'],
@@ -65,9 +75,9 @@ model = CatBoostClassifier(iterations=1000,
                                verbose=False,
                                use_best_model=True,
                                task_type='CPU')
-model.load_model("catmodel.cbm")
+    model.load_model("ml/9138/catmodel.cbm")
 
-meta_model = CatBoostClassifier(iterations=1000,
+    meta_model = CatBoostClassifier(iterations=1000,
                                     depth=6,
                                     learning_rate=0.1,
                                     custom_loss=['Accuracy'],
@@ -75,8 +85,8 @@ meta_model = CatBoostClassifier(iterations=1000,
                                     verbose=False,
                                     use_best_model=True,
                                     task_type='CPU')
-meta_model.load_model("meta_catmodel.cbm")
+    meta_model.load_model("ml/9138/meta_catmodel.cbm")
 
-dataset = initDataset()
-dataset = update_rates(dataset, count=4000)
+    dataset = initDataset()
+    dataset = update_rates(dataset, count=4000)
    
