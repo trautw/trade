@@ -6,28 +6,36 @@ FEATURE_COUNT = len(MA_PERIODS) + 2
 
 print('Hello from features')
 
+
 def get_features(the_data) -> pd.DataFrame:
     pTable = the_data.copy()
     pFixedC = the_data.copy()
     count = 0
-    print(pFixedC)
-    print(pFixedC.describe())
     for i in MA_PERIODS:
         pTable[str(count)] = pFixedC - pFixedC.rolling(i).mean()
         count += 1
 
+    # Standard deviation 20
     pTable['std'] = pFixedC.rolling(20).std(ddof=0)
+    # Moving Average 20
     pTable['MA-TP'] = pFixedC.rolling(20).mean()
+    # Bollinge Band Upper
     pTable['BOLU'] = pTable['MA-TP'] + 2*pTable['std']
+    # Bollinge Band Lower
     pTable['BOLD'] = pTable['MA-TP'] - 2*pTable['std']
 
-    pTable[str(count)] = pTable['MA-TP'] > pTable['BOLU']
-    count += 1
-    pTable[str(count)] = pTable['MA-TP'] < pTable['BOLD']
-    count += 1
+    # above bollinger band
+    # pTable['BBAbove'] = pTable['MA-TP'] > pTable['BOLU']
+    pTable['BBAbove'] = pTable['MA-TP'] - pTable['BOLU']
+
+    # below bollinger band
+    # pTable['BBBelow'] = pTable['MA-TP'] < pTable['BOLD']
+    pTable['BBBelow'] = pTable['MA-TP'] - pTable['BOLD']
 
     pTable.drop('std', axis=1, inplace=True)
     pTable.drop('MA-TP', axis=1, inplace=True)
+    pTable.drop('BOLU', axis=1, inplace=True)
+    pTable.drop('BOLD', axis=1, inplace=True)
 
     # print(pTable)
     # print(pTable.describe())
@@ -49,5 +57,5 @@ def get_historic_prices() -> pd.DataFrame:
     pFixed.index = pd.to_datetime(pFixed.index, unit='s')
     pFixed = pFixed.dropna()
 
-    pFixed = update_features(pFixed)
+    # pFixed = update_features(pFixed)
     return pFixed.dropna()
