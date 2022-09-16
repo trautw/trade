@@ -2,7 +2,7 @@ from catboost import CatBoostClassifier
 import pandas as pd
 import MetaTrader5 as mt5
 
-from features import update_features
+from features import get_features
 
 MA_PERIODS = [i for i in range(15, 500, 15)]
 
@@ -29,7 +29,7 @@ def update_rates(old_df, count = 10) -> pd.DataFrame:
     print(rates_frame.tail())
     return pd.concat([old_df, rates_frame]).dropna().drop_duplicates()
 
-def calc_features(ds) -> pd.Series:
+def calc_features_old(ds) -> pd.Series:
     current_row = ds.iloc[-1]
     dsC = ds.copy()
     X = pd.Series(dtype = float)
@@ -54,7 +54,7 @@ def newBar():
     print('Rates updated')
     print(dataset)
     # X = calc_features(dataset)
-    X = update_features(dataset)
+    X = get_features(dataset)
     signal = model.predict(X.iloc[-1])
     meta_signal = meta_model.predict(X.iloc[-1])
     return signal, meta_signal

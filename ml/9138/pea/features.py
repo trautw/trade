@@ -6,10 +6,12 @@ FEATURE_COUNT = len(MA_PERIODS) + 2
 
 print('Hello from features')
 
-
-def update_features(pTable) -> pd.DataFrame:
-    pFixedC = pTable.copy()
+def get_features(the_data) -> pd.DataFrame:
+    pTable = the_data.copy()
+    pFixedC = the_data.copy()
     count = 0
+    print(pFixedC)
+    print(pFixedC.describe())
     for i in MA_PERIODS:
         pTable[str(count)] = pFixedC - pFixedC.rolling(i).mean()
         count += 1
